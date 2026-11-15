@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
-import { ExternalLink, CheckCircle2, Sparkles } from 'lucide-react';
+import { ExternalLink, CheckCircle2, Sparkles, FileText } from 'lucide-react';
 import { Header } from './components/Header';
 import { AnalyticsCards } from './components/AnalyticsCards';
 import { ClientForm } from './components/ClientForm';
@@ -117,7 +117,7 @@ export function App() {
     }
   };
 
-  // REAL-TIME MULTI-STAGE BUTTON LOGIC (INR ₹ / GST Billing)
+  // REAL-TIME MULTI-STAGE BUTTON LOGIC (INR ₹ / GST Billing & Safe Cloud Dispatch)
   const handleGenerateInvoice = async (client) => {
     const clientId = client._id;
 
@@ -176,10 +176,46 @@ export function App() {
             },
           }
         );
-      } else {
+      } else if (res.emailDispatched) {
         toast.success(
           `Tax Invoice #${res.invoiceNumber} dispatched to ${res.recipientEmail}!`,
           { duration: 5000 }
+        );
+      } else {
+        // Outbound cloud SMTP restricted on Render free tier, but invoice & MongoDB stats successfully generated
+        const pdfUrl = billingService.getPdfPreviewUrl(clientId);
+        toast(
+          (t) => (
+            <div className="flex flex-col space-y-2">
+              <div className="flex items-center space-x-2 text-slate-900 font-bold text-sm">
+                <CheckCircle2 className="w-5 h-5 text-emerald-500 flex-shrink-0" />
+                <span>GST Invoice #{res.invoiceNumber} Generated!</span>
+              </div>
+              <p className="text-xs text-slate-600">
+                Invoice logged in registry &amp; counters updated. (Email queued: cloud SMTP port restricted on Render free tier).
+              </p>
+              <a
+                href={pdfUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => toast.dismiss(t.id)}
+                className="inline-flex items-center justify-center space-x-1 px-3 py-1.5 bg-slate-900 hover:bg-blue-600 text-white rounded-md text-xs font-bold shadow-xs transition-colors"
+              >
+                <span>Inspect Generated PDF</span>
+                <ExternalLink className="w-3.5 h-3.5 ml-1" />
+              </a>
+            </div>
+          ),
+          {
+            duration: 8000,
+            style: {
+              background: '#FFFFFF',
+              border: '1px solid #CBD5E1',
+              padding: '14px',
+              borderRadius: '12px',
+              boxShadow: '0 10px 25px -5px rgba(15, 23, 42, 0.15)',
+            },
+          }
         );
       }
 

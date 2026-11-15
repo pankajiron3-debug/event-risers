@@ -2,6 +2,9 @@ import nodemailer from 'nodemailer';
 
 let cachedTestAccount = null;
 
+// Short socket and connection timeout to prevent hanging on cloud providers (e.g., Render free tier)
+const SMTP_TIMEOUT_MS = 6000;
+
 /**
  * Format numeric value to Indian currency string (₹ X,XX,XXX.XX)
  */
@@ -15,7 +18,7 @@ const formatCurrencyINR = (amount) => {
 
 /**
  * Creates or retrieves a configured Nodemailer transporter.
- * Automatically falls back to Ethereal SMTP if EMAIL_USER / EMAIL_PASS are not configured.
+ * Automatically falls back to Ethereal SMTP with strict timeout guards.
  */
 const getTransporter = async () => {
   const hasCustomCredentials =
@@ -34,15 +37,22 @@ const getTransporter = async () => {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
+      connectionTimeout: SMTP_TIMEOUT_MS,
+      greetingTimeout: SMTP_TIMEOUT_MS,
+      socketTimeout: SMTP_TIMEOUT_MS,
     });
 
     return { transporter, isEthereal: false };
   }
 
-  // Fallback to Ethereal test account for zero-config demos
+  // Fallback to Ethereal test account with timeout guard
   if (!cachedTestAccount) {
-    console.log('[Email Service] No custom SMTP credentials provided. Initializing Ethereal Test Account...');
-    cachedTestAccount = await nodemailer.createTestAccount();
+    console.log('[Email Service] Initializing Ethereal Test Account with 5s timeout guard...');
+    const testAccountPromise = nodemailer.createTestAccount();
+    const timeoutPromise = new Promise((_, reject) =>
+      setTimeout(() => reject(new Error('Ethereal test account creation timed out (5s limit)')), 5000)
+    );
+    cachedTestAccount = await Promise.race([testAccountPromise, timeoutPromise]);
     console.log(`[Email Service] Ethereal Account Active: ${cachedTestAccount.user}`);
   }
 
@@ -54,6 +64,9 @@ const getTransporter = async () => {
       user: cachedTestAccount.user,
       pass: cachedTestAccount.pass,
     },
+    connectionTimeout: SMTP_TIMEOUT_MS,
+    greetingTimeout: SMTP_TIMEOUT_MS,
+    socketTimeout: SMTP_TIMEOUT_MS,
   });
 
   return { transporter, isEthereal: true };
@@ -62,6 +75,7 @@ const getTransporter = async () => {
 /**
  * Dispatches an automated executive corporate invoice email with in-memory PDF attachment
  * localized for the Indian B2B corporate market.
+ * Wrapped in hard timeout so it never hangs if cloud host blocks outbound SMTP ports.
  *
  * @param {Object} client - Mongoose Client document
  * @param {Buffer} pdfBuffer - In-memory PDF buffer from PDFKit
@@ -313,7 +327,13 @@ export const sendInvoiceEmail = async (client, pdfBuffer, invoiceMeta = {}) => {
     ],
   };
 
-  const info = await transporter.sendMail(mailOptions);
+  // Hard timeout guard on sendMail so it never exceeds 7 seconds if outbound SMTP is blocked
+  const sendMailPromise = transporter.sendMail(mailOptions);
+  const timeoutPromise = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('SMTP connection timed out (outbound ports 465/587 restricted on cloud host)')), 7000)
+  );
+
+  const info = await Promise.race([sendMailPromise, timeoutPromise]);
   const previewUrl = isEthereal ? nodemailer.getTestMessageUrl(info) : null;
 
   if (previewUrl) {
