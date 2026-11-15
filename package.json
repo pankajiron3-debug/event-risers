@@ -1,0 +1,9 @@
+{
+  "name": "event-risers",
+  "version": "1.0.0",
+  "description": "Event Risers - B2B Corporate SaaS Billing & CMS Engine",
+  "scripts": {
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm run dev"
+  }
+}
