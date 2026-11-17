@@ -2,12 +2,9 @@ import React, { useState } from 'react';
 import {
   FileText,
   Mail,
-  CheckCircle2,
+  Check,
   Trash2,
-  Clock,
-  Sparkles,
-  Building,
-  User,
+  Building2,
   Calendar,
 } from 'lucide-react';
 import { billingService } from '../services/api';
@@ -23,49 +20,49 @@ export const ClientTable = ({
 
   if (isLoading && clients.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm p-12 text-center">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-blue-50 text-blue-600 mb-4 animate-spin">
-          <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+      <div className="bg-panel rounded-lg border border-hairline p-12 text-center shadow-subtle">
+        <div className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-surface text-ink-muted mb-3 animate-spin">
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" />
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
           </svg>
         </div>
-        <h3 className="text-base font-bold text-slate-800">Loading Client Registry...</h3>
-        <p className="text-xs text-slate-500 mt-1">Retrieving Indian enterprise accounts and contract metrics</p>
+        <h3 className="text-sm font-semibold text-ink">Loading client directory...</h3>
+        <p className="text-xs text-ink-subtle mt-1">Retrieving verified enterprise accounts</p>
       </div>
     );
   }
 
   if (clients.length === 0) {
     return (
-      <div className="bg-white rounded-2xl border border-dashed border-slate-300 shadow-sm p-12 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-slate-100 flex items-center justify-center mx-auto text-slate-400 mb-4">
-          <Building className="w-7 h-7" />
+      <div className="bg-panel rounded-lg border border-hairline p-12 text-center shadow-subtle">
+        <div className="w-10 h-10 rounded-md bg-surface flex items-center justify-center mx-auto text-ink-muted mb-3">
+          <Building2 className="w-5 h-5" />
         </div>
-        <h3 className="text-base font-bold text-slate-800">No Corporate Partners Found</h3>
-        <p className="text-sm text-slate-500 mt-1 max-w-md mx-auto">
-          No records match your criteria. Expand the onboarding form above or prefill an Indian corporate partner to test automated GST billing.
+        <h3 className="text-sm font-semibold text-ink">No Corporate Accounts Found</h3>
+        <p className="text-xs text-ink-subtle mt-1 max-w-sm mx-auto">
+          No records match your search filter. Add a client above to begin invoicing.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
+    <div className="bg-panel rounded-lg border border-hairline shadow-subtle overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-slate-900 text-white text-[11px] font-bold uppercase tracking-wider select-none border-b border-slate-800">
-              <th className="py-4 px-5">Enterprise Client</th>
-              <th className="py-4 px-5">Event Engagement</th>
-              <th className="py-4 px-5 text-right">Contract Valuation (₹ INR)</th>
-              <th className="py-4 px-5 text-center">GST Invoices Dispatched</th>
-              <th className="py-4 px-5">Last Invoiced</th>
-              <th className="py-4 px-5 text-center">Automation Dispatch</th>
-              <th className="py-4 px-4 text-center">Actions</th>
+            <tr className="bg-surface/70 text-ink-muted text-[11px] font-semibold uppercase tracking-wider select-none border-b border-hairline font-sans">
+              <th className="py-3 px-6">Client / Company</th>
+              <th className="py-3 px-6">Event Scope</th>
+              <th className="py-3 px-6 text-right">Total Contract Value</th>
+              <th className="py-3 px-6 text-center">Invoices Sent</th>
+              <th className="py-3 px-6">Last Invoiced</th>
+              <th className="py-3 px-6 text-center">Billing</th>
+              <th className="py-3 px-4 text-center">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-100 text-sm">
+          <tbody className="divide-y divide-hairline text-xs font-sans">
             {clients.map((client) => {
               const currentStage = rowStages[client._id] || 'idle';
               const isProcessing = currentStage === 'generating' || currentStage === 'sending';
@@ -74,25 +71,22 @@ export const ClientTable = ({
               return (
                 <tr
                   key={client._id}
-                  className="hover:bg-slate-50/80 transition-colors group"
+                  className="hover:bg-surface/50 transition-colors group"
                 >
                   {/* Company Name & Contact info */}
-                  <td className="py-4 px-5">
+                  <td className="py-4 px-6">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-300/80 flex items-center justify-center font-bold text-slate-700 text-sm shadow-xs group-hover:border-blue-300 transition-colors">
+                      <div className="w-8 h-8 rounded bg-surface border border-hairline flex items-center justify-center font-bold text-ink-muted text-xs select-none">
                         {client.companyName ? client.companyName.substring(0, 2).toUpperCase() : 'CO'}
                       </div>
                       <div>
-                        <div className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                        <div className="font-semibold text-ink text-xs sm:text-[13px]">
                           {client.companyName}
                         </div>
-                        <div className="flex items-center space-x-2 text-xs text-slate-500 mt-0.5">
-                          <span className="flex items-center">
-                            <User className="w-3 h-3 mr-1 text-slate-400" />
-                            {client.contactPerson}
-                          </span>
+                        <div className="flex items-center space-x-1.5 text-[11px] text-ink-subtle mt-0.5">
+                          <span>{client.contactPerson}</span>
                           <span>&bull;</span>
-                          <span className="text-slate-400 font-mono text-[11.5px] truncate max-w-[170px]" title={client.email}>
+                          <span className="font-mono text-[11px] truncate max-w-[170px]" title={client.email}>
                             {client.email}
                           </span>
                         </div>
@@ -101,15 +95,15 @@ export const ClientTable = ({
                   </td>
 
                   {/* Event Type Badge */}
-                  <td className="py-4 px-5">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200/80">
-                      <Calendar className="w-3 h-3 mr-1.5 text-blue-500" />
+                  <td className="py-4 px-6">
+                    <span className="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium bg-teal-subtle text-teal-dark border border-teal-border">
+                      <Calendar className="w-3 h-3 mr-1 text-teal-deep" />
                       {client.eventType}
                     </span>
                   </td>
 
-                  {/* Contract Valuation (₹ INR) */}
-                  <td className="py-4 px-5 text-right font-mono font-bold text-slate-900 text-sm">
+                  {/* Contract Valuation */}
+                  <td className="py-4 px-6 text-right font-mono font-semibold text-ink text-xs sm:text-[13px] tabular-nums">
                     {`₹ ${Number(client.totalCost).toLocaleString('en-IN', {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
@@ -117,49 +111,46 @@ export const ClientTable = ({
                   </td>
 
                   {/* Invoices Sent Count */}
-                  <td className="py-4 px-5 text-center">
+                  <td className="py-4 px-6 text-center">
                     <span
-                      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold ${
+                      className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-mono font-medium tabular-nums ${
                         client.invoicesSent > 0
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                          : 'bg-slate-100 text-slate-600 border border-slate-200'
+                          ? 'bg-teal-subtle text-teal-dark border border-teal-border'
+                          : 'bg-surface text-ink-subtle border border-hairline'
                       }`}
                     >
-                      {client.invoicesSent || 0} sent
+                      {client.invoicesSent || 0}
                     </span>
                   </td>
 
                   {/* Last Invoiced Date */}
-                  <td className="py-4 px-5 text-xs text-slate-500">
+                  <td className="py-4 px-6 text-ink-muted font-mono text-[11px] tabular-nums">
                     {client.lastInvoicedAt ? (
-                      <div className="flex items-center space-x-1.5">
-                        <Clock className="w-3.5 h-3.5 text-slate-400" />
-                        <span>
-                          {new Date(client.lastInvoicedAt).toLocaleDateString('en-IN', {
-                            day: '2-digit',
-                            month: 'short',
-                            year: 'numeric',
-                          })}
-                        </span>
-                      </div>
+                      <span>
+                        {new Date(client.lastInvoicedAt).toLocaleDateString('en-IN', {
+                          day: '2-digit',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </span>
                     ) : (
-                      <span className="text-slate-400 italic">Never billed</span>
+                      <span className="text-ink-subtle/70 font-sans italic">Never</span>
                     )}
                   </td>
 
-                  {/* REAL-TIME MULTI-STAGE BUTTON */}
-                  <td className="py-4 px-5 text-center">
+                  {/* Billing Action Button */}
+                  <td className="py-4 px-6 text-center">
                     <button
                       onClick={() => onGenerateInvoice(client)}
                       disabled={isProcessing || currentStage === 'done'}
-                      className={`inline-flex items-center justify-center px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all min-w-[178px] shadow-xs ${
+                      className={`inline-flex items-center justify-center px-3 py-1.5 rounded-md text-xs font-medium transition-all min-w-[175px] shadow-xs select-none ${
                         currentStage === 'generating'
-                          ? 'bg-amber-600 text-white cursor-wait animate-pulse'
+                          ? 'bg-ochre text-white cursor-wait'
                           : currentStage === 'sending'
-                          ? 'bg-sky-600 text-white cursor-wait animate-pulse'
+                          ? 'bg-teal-hover text-white cursor-wait'
                           : currentStage === 'done'
-                          ? 'bg-emerald-600 text-white cursor-default'
-                          : 'bg-slate-900 hover:bg-blue-600 text-white hover:shadow-md'
+                          ? 'bg-emerald-800 text-white cursor-default'
+                          : 'bg-teal-deep hover:bg-teal-hover text-white'
                       }`}
                     >
                       {currentStage === 'generating' && (
@@ -184,49 +175,49 @@ export const ClientTable = ({
 
                       {currentStage === 'done' && (
                         <>
-                          <CheckCircle2 className="w-3.5 h-3.5 mr-1.5 text-emerald-100" />
-                          <span>Done!</span>
+                          <Check className="w-3.5 h-3.5 mr-1 text-emerald-200" />
+                          <span>Done</span>
                         </>
                       )}
 
                       {currentStage === 'idle' && (
                         <>
-                          <Mail className="w-3.5 h-3.5 mr-1.5 text-sky-300" />
+                          <Mail className="w-3.5 h-3.5 mr-1.5 text-teal-border" />
                           <span>Generate &amp; Email Invoice</span>
                         </>
                       )}
                     </button>
                   </td>
 
-                  {/* Row Actions: View PDF & Delete */}
+                  {/* Actions: View PDF & Delete */}
                   <td className="py-4 px-4 text-center">
-                    <div className="flex items-center justify-center space-x-1.5">
+                    <div className="flex items-center justify-center space-x-1">
                       {/* Direct PDF View */}
                       <a
                         href={pdfUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        title="Inspect Generated GST PDF Stream"
-                        className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+                        title="View Tax Invoice PDF"
+                        className="p-1.5 text-ink-muted hover:text-teal-deep hover:bg-surface rounded transition-colors"
                       >
-                        <FileText className="w-4 h-4" />
+                        <FileText className="w-3.5 h-3.5" />
                       </a>
 
-                      {/* Delete with inline confirm */}
+                      {/* Delete */}
                       {deleteConfirmId === client._id ? (
-                        <div className="flex items-center space-x-1 bg-red-50 p-1 rounded-md border border-red-200">
+                        <div className="flex items-center space-x-1 bg-red-50 p-0.5 rounded border border-red-200">
                           <button
                             onClick={() => {
                               onDeleteClient(client._id);
                               setDeleteConfirmId(null);
                             }}
-                            className="px-1.5 py-0.5 text-[10px] font-bold text-white bg-red-600 rounded hover:bg-red-700"
+                            className="px-1.5 py-0.5 text-[10px] font-bold text-white bg-red-700 rounded hover:bg-red-800"
                           >
-                            Purge
+                            Delete
                           </button>
                           <button
                             onClick={() => setDeleteConfirmId(null)}
-                            className="px-1.5 py-0.5 text-[10px] font-semibold text-slate-600 hover:text-slate-800"
+                            className="px-1 py-0.5 text-[10px] text-ink-muted hover:text-ink"
                           >
                             Cancel
                           </button>
@@ -234,10 +225,10 @@ export const ClientTable = ({
                       ) : (
                         <button
                           onClick={() => setDeleteConfirmId(client._id)}
-                          title="Purge Client Record"
-                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                          title="Remove Client"
+                          className="p-1.5 text-ink-subtle hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                         >
-                          <Trash2 className="w-4 h-4" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>
@@ -249,13 +240,10 @@ export const ClientTable = ({
         </table>
       </div>
 
-      {/* Table Footer */}
-      <div className="bg-slate-50/80 px-6 py-3 border-t border-slate-200/80 flex items-center justify-between text-xs text-slate-500">
-        <div className="flex items-center space-x-2">
-          <Sparkles className="w-3.5 h-3.5 text-blue-500" />
-          <span>Zero-disk in-memory GST PDF generation &bull; Automated Indian Corporate Dispatch (₹ INR)</span>
-        </div>
-        <span>Registry synced with MongoDB</span>
+      {/* Ledger Clean Table Footer */}
+      <div className="bg-surface/40 px-6 py-3 border-t border-hairline flex items-center justify-between text-xs text-ink-subtle font-mono text-[11px]">
+        <span>Showing {clients.length} accounts &bull; 18% GST Applicable</span>
+        <span className="hidden sm:inline">All amounts in INR (₹)</span>
       </div>
     </div>
   );

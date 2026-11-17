@@ -1,5 +1,5 @@
 import React from 'react';
-import { Building2, FileCheck2, TrendingUp } from 'lucide-react';
+import { Building2, FileText, IndianRupee } from 'lucide-react';
 
 export const AnalyticsCards = ({ analytics = {}, isLoading = false }) => {
   const {
@@ -8,7 +8,7 @@ export const AnalyticsCards = ({ analytics = {}, isLoading = false }) => {
     totalContractValuation = 0,
   } = analytics;
 
-  // Indian format with ₹ symbol (e.g., ₹19,50,000)
+  // Indian currency formatting with JetBrains Mono tabular numbers
   const formattedValuation = `₹ ${Number(totalContractValuation).toLocaleString('en-IN', {
     maximumFractionDigits: 0,
   })}`;
@@ -16,77 +16,68 @@ export const AnalyticsCards = ({ analytics = {}, isLoading = false }) => {
   const cards = [
     {
       id: 'clients',
-      title: 'Total Corporate Clients',
-      value: isLoading ? '...' : totalClients.toLocaleString('en-IN'),
-      subtext: 'Active Indian enterprise contracts in CMS',
+      label: 'Corporate Clients',
+      value: isLoading ? '—' : totalClients.toLocaleString('en-IN'),
+      detail: 'Active enterprise contracts',
       icon: Building2,
-      iconBg: 'bg-blue-50 text-blue-600 border-blue-200',
-      badge: 'B2B India Registry',
-      badgeColor: 'bg-blue-100 text-blue-700',
+      badge: 'Directory',
+      badgeClass: 'bg-surface text-ink-muted border-hairline',
     },
     {
       id: 'invoices',
-      title: 'Total Invoices Generated',
-      value: isLoading ? '...' : totalInvoicesSent.toLocaleString('en-IN'),
-      subtext: 'Automated GST PDF dispatches completed',
-      icon: FileCheck2,
-      iconBg: 'bg-emerald-50 text-emerald-600 border-emerald-200',
-      badge: 'GST Compliant',
-      badgeColor: 'bg-emerald-100 text-emerald-700',
+      label: 'Invoices Sent',
+      value: isLoading ? '—' : totalInvoicesSent.toLocaleString('en-IN'),
+      detail: 'Itemized tax invoices issued',
+      icon: FileText,
+      badge: 'Dispatched',
+      badgeClass: 'bg-teal-subtle text-teal-dark border-teal-border',
     },
     {
       id: 'valuation',
-      title: 'Total Contract Valuation (₹ INR)',
-      value: isLoading ? '...' : formattedValuation,
-      subtext: 'Aggregated Indian B2B client pipeline',
-      customIcon: (
-        <span className="font-extrabold text-xl text-violet-600 font-sans">₹</span>
-      ),
-      iconBg: 'bg-violet-50 text-violet-600 border-violet-200',
-      badge: 'Portfolio Value (INR)',
-      badgeColor: 'bg-violet-100 text-violet-700',
+      label: 'Total Contract Value',
+      value: isLoading ? '—' : formattedValuation,
+      detail: 'Cumulative contract portfolio',
+      icon: IndianRupee,
+      badge: 'INR Ledger',
+      badgeClass: 'bg-ochre-subtle text-ochre border-ochre-border',
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       {cards.map((card) => {
         const IconComponent = card.icon;
         return (
           <div
             key={card.id}
-            className="bg-white rounded-2xl p-6 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group"
+            className="bg-panel rounded-lg border border-hairline p-5 shadow-subtle hover:border-hairline-hover transition-colors"
           >
-            {/* Top row with icon & badge */}
-            <div className="flex items-center justify-between mb-4">
-              <div
-                className={`w-12 h-12 rounded-xl flex items-center justify-center border shadow-xs ${card.iconBg} group-hover:scale-105 transition-transform`}
-              >
-                {card.customIcon ? card.customIcon : <IconComponent className="w-6 h-6" />}
-              </div>
+            {/* Top row with clean label & pill */}
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-semibold text-ink-muted uppercase tracking-wider font-sans">
+                {card.label}
+              </span>
               <span
-                className={`text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full ${card.badgeColor}`}
+                className={`text-[10px] font-mono font-medium px-2 py-0.5 rounded border ${card.badgeClass}`}
               >
                 {card.badge}
               </span>
             </div>
 
-            {/* Metric numbers */}
-            <div>
-              <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">
-                {card.title}
-              </p>
-              <div className="text-3xl font-extrabold text-slate-900 tracking-tight font-['Plus_Jakarta_Sans']">
+            {/* Metric Value */}
+            <div className="flex items-baseline justify-between">
+              <div className="text-2xl sm:text-3xl font-bold text-ink tracking-tight font-mono tabular-nums">
                 {card.value}
               </div>
-              <div className="flex items-center mt-2 text-xs text-slate-500 space-x-1.5">
-                <TrendingUp className="w-3.5 h-3.5 text-blue-500" />
-                <span>{card.subtext}</span>
+              <div className="w-8 h-8 rounded-md bg-surface border border-hairline flex items-center justify-center text-ink-muted">
+                <IconComponent className="w-4 h-4" />
               </div>
             </div>
 
-            {/* Bottom accent glow */}
-            <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-blue-500 to-sky-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+            {/* Subtext */}
+            <p className="mt-2 text-xs text-ink-subtle font-sans">
+              {card.detail}
+            </p>
           </div>
         );
       })}
